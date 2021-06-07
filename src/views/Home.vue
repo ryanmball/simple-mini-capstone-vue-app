@@ -23,7 +23,12 @@
         v-model="newProductParams.image_url"
       /><br />
       <button v-on:click="productCreate()">Add Product</button>
-      <p v-if="errors">ERRORS:<br />{{ errors }}</p>
+      <p v-if="errors">
+        <strong><u>ERRORS:</u></strong>
+      </p>
+      <p v-for="error in errors" v-bind:key="error">
+        <strong>{{ error }}</strong>
+      </p>
     </div>
     <h1><u>Products</u></h1>
     <div v-for="product in products" v-bind:key="product.id">
