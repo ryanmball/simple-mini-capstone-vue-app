@@ -2,17 +2,25 @@
   <div class="home">
     <div>
       <h3>Create new product:</h3>
-      <input type="text" v-model="newProductName" placeholder="name" /><br />
+      <input
+        type="text"
+        v-model="newProductParams.name"
+        placeholder="name"
+      /><br />
       <input
         type="text"
         placeholder="description"
-        v-model="newProductDescription"
+        v-model="newProductParams.description"
       /><br />
-      <input type="text" placeholder="price" v-model="newProductPrice" /><br />
+      <input
+        type="text"
+        placeholder="price"
+        v-model="newProductParams.price"
+      /><br />
       <input
         type="text"
         placeholder="image url"
-        v-model="newProductImageUrl"
+        v-model="newProductParams.image_url"
       /><br />
       <button v-on:click="productCreate()">Add Product</button>
       <p v-if="errors">ERRORS:<br />{{ errors }}</p>
@@ -57,10 +65,7 @@ export default {
   data: function () {
     return {
       products: [],
-      newProductName: "",
-      newProductDescription: "",
-      newProductPrice: "",
-      newProductImageUrl: "",
+      newProductParams: {},
       errors: false,
       currentProduct: "",
     };
@@ -71,19 +76,14 @@ export default {
   methods: {
     productIndex: function () {
       axios.get("http://localhost:3000/products").then((response) => {
-        console.log(response.data);
+        console.log("Recipes array", response.data);
         this.products = response.data;
       });
     },
     productCreate: function () {
-      var params = {
-        name: this.newProductName,
-        description: this.newProductDescription,
-        price: this.newProductPrice,
-        image_url: this.newProductImageUrl,
-      };
+      console.log(this.newProductParams);
       axios
-        .post("http://localhost:3000/products", params)
+        .post("http://localhost:3000/products", this.newProductParams)
         .then((response) => {
           console.log("Product added!", response.data);
           this.products.push(response.data);
@@ -92,10 +92,7 @@ export default {
           console.log(error.response.data.errors);
           this.errors = error.response.data.errors;
         });
-      this.newProductName = "";
-      this.newProductDescription = "";
-      this.newProductPrice = "";
-      this.newProductImageUrl = "";
+      this.newProductParams = {};
     },
     productShow: function (product) {
       console.log(product);
