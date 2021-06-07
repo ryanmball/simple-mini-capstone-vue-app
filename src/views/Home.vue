@@ -40,6 +40,7 @@
           Image Url: <input type="text" v-model="currentProduct.image_url" />
         </p>
         <button v-on:click="productUpdate()">Update</button>
+        <button v-on:click="productDestroy()">Delete</button>
         <button>Close</button>
       </form>
     </dialog>
@@ -120,6 +121,15 @@ export default {
         .catch((error) => {
           console.log(error.response.data.errors);
           this.errors = error.response.data.errors;
+        });
+    },
+    productDestroy: function () {
+      axios
+        .delete(`http://localhost:3000/products/${this.currentProduct.id}`)
+        .then((response) => {
+          console.log(response.data);
+          var index = this.products.indexOf(this.currentProduct);
+          this.products.splice(index, 1);
         });
     },
   },
