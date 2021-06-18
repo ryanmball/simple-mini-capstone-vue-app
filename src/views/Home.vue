@@ -30,13 +30,43 @@
         <strong>{{ error }}</strong>
       </p>
     </div>
+    <datalist id="product-names">
+      <option v-for="product in products" v-bind:key="product.id">
+        {{ product.name }}
+      </option>
+    </datalist>
     <h1><u>Products</u></h1>
-    <div v-for="product in products" v-bind:key="product.id">
+    <input
+      type="text"
+      v-model="filter"
+      list="product-names"
+      placeholder="search"
+    />
+    <br />
+    <select name="order" id="order" v-model="order">
+      <option value="">None</option>
+      <option value="name">Name</option>
+      <option value="created_at">Created</option>
+    </select>
+    <br />
+    <button @click="orderName()">Sort by Name</button>
+    <button @click="orderCreated()">Sort by Created</button> <br />
+    <button @click="orderClear()">Clear Filter</button>
+    <div
+      v-for="product in filterBy(
+        orderBy(products, order, -1),
+        filter,
+        'name',
+        'description'
+      )"
+      v-bind:key="product.id"
+    >
       <h3>{{ product.name }}</h3>
       <p><img :src="product.image_url" alt="" /></p>
       <button v-on:click="productShow(product)">More Info</button>
       <p>Description: {{ product.description }}</p>
       <p>Price: {{ product.price }}</p>
+      <p>Created: {{ product.created_at }}</p>
       <br />
     </div>
     <dialog id="product-details">
@@ -66,13 +96,17 @@ img {
 </style>
 <script>
 import axios from "axios";
+import Vue2Filters from "vue2-filters";
 export default {
+  mixins: [Vue2Filters.mixin],
   data: function () {
     return {
       products: [],
       newProductParams: {},
       errors: false,
       currentProduct: "",
+      filter: "",
+      order: "",
     };
   },
   created: function () {
@@ -133,6 +167,16 @@ export default {
           var index = this.products.indexOf(this.currentProduct);
           this.products.splice(index, 1);
         });
+    },
+    orderName: function () {
+      this.order = "name";
+    },
+    orderCreated: function () {
+      this.order = "created_at";
+    },
+    orderClear: function () {
+      this.order = "";
+      this.filter = "";
     },
   },
 };
