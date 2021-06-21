@@ -1,7 +1,12 @@
 <template>
   <div class="home">
     <div>
+      <!-- Product Create -->
       <h3>Create new product:</h3>
+      <img :src="`https://http.cat/${status}`" alt="" /> <br />
+      <small class="text-danger" v-for="error in errors" v-bind:key="error">
+        {{ error }} <br />
+      </small>
       <input
         type="text"
         v-model="newProductParams.name"
@@ -12,6 +17,10 @@
         placeholder="description"
         v-model="newProductParams.description"
       /><br />
+      <!-- <small class="text-danger" v-if="newProductParams.description.length > 0"
+        >{{ 250 - newProductParams.description.length }} characters remaining
+        <br />
+      </small> -->
       <input
         type="text"
         placeholder="price"
@@ -30,6 +39,8 @@
         <strong>{{ error }}</strong>
       </p>
     </div>
+
+    <!-- Product Index -->
     <datalist id="product-names">
       <option v-for="product in products" v-bind:key="product.id">
         {{ product.name }}
@@ -62,13 +73,17 @@
       v-bind:key="product.id"
     >
       <h3>{{ product.name }}</h3>
-      <p><img :src="product.image_url" alt="" /></p>
+      <p class="animate__animated animate__fadeIn">
+        <img :src="product.image_url" alt="" />
+      </p>
       <button v-on:click="productShow(product)">More Info</button>
       <p>Description: {{ product.description }}</p>
       <p>Price: {{ product.price }}</p>
-      <p>Created: {{ product.created_at }}</p>
+      <p>Created: {{ relativeCreated(product.created_at) }}</p>
       <br />
     </div>
+
+    <!-- Product Show -->
     <dialog id="product-details">
       <form method="dialog">
         <h1>Product Info</h1>
@@ -93,17 +108,23 @@
 img {
   width: 300px;
 }
+.text-danger {
+  color: red;
+}
 </style>
 <script>
 import axios from "axios";
 import Vue2Filters from "vue2-filters";
+import moment from "moment";
+
 export default {
   mixins: [Vue2Filters.mixin],
   data: function () {
     return {
       products: [],
-      newProductParams: {},
+      newProductParams: { description: "" },
       errors: false,
+      status: "",
       currentProduct: "",
       filter: "",
       order: "",
@@ -130,6 +151,7 @@ export default {
         .catch((error) => {
           console.log(error.response.data.errors);
           this.errors = error.response.data.errors;
+          this.status = error.response.data.status;
         });
       this.newProductParams = {};
     },
@@ -177,6 +199,9 @@ export default {
     orderClear: function () {
       this.order = "";
       this.filter = "";
+    },
+    relativeCreated: function (date) {
+      return moment(date).fromNow();
     },
   },
 };
